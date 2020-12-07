@@ -94,7 +94,7 @@ Example: validate 4012888888881882 = False
 -}
 -- Exercise 4
 validate :: Integer -> Bool
-validate n = (sumDigits (doubleEveryOther (toDigits n))) `mod` 10 == 0
+validate n = ((0==) . (`mod` 10) . sumDigits . doubleEveryOther . toDigits)(n)
 
 
 {-
