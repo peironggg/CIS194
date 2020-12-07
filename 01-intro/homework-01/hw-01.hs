@@ -36,7 +36,7 @@ Example: toDigits (-17) == []
 -}
 -- Exercise 1
 toDigits :: Integer -> [Integer]
-toDigits n = reverse (toDigitsRev n)
+toDigits n = (reverse . toDigitsRev) n
 
 toDigitsRev :: Integer -> [Integer]
 toDigitsRev n
@@ -54,19 +54,9 @@ Example: doubleEveryOther [1,2,3] == [1,4,3]
 -}
 -- Exercise 2
 doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther xs
-  | length (xs) `mod` 2 == 0 = doubleEven xs
-  | otherwise                = doubleOdd xs
+doubleEveryOther xs = reverse $ zipWith (*) (cycle [1, 2]) (reverse xs)
 
-doubleEven :: [Integer] -> [Integer]
-doubleEven [] = []
-doubleEven (x:[]) = [2*x]
-doubleEven (x:y:zs) = 2*x : y : doubleEven zs
 
-doubleOdd :: [Integer] -> [Integer]
-doubleOdd [] = []
-doubleOdd (x:[]) = [x]
-doubleOdd (x:y:zs) = x : 2*y : doubleOdd zs
 
 {-
 Exercise 3 The output of doubleEveryOther has a mix of one-digit
@@ -83,7 +73,7 @@ sumDigit n
 
 sumDigits :: [Integer] -> Integer
 sumDigits [] = 0
-sumDigits (x:xs) = sumDigit x + sumDigits xs
+sumDigits (x : xs) = sumDigit x + sumDigits xs
 
 {-
 Exercise 4 Define the function
@@ -94,7 +84,7 @@ Example: validate 4012888888881882 = False
 -}
 -- Exercise 4
 validate :: Integer -> Bool
-validate n = ((0==) . (`mod` 10) . sumDigits . doubleEveryOther . toDigits)(n)
+validate n = ((0 ==) . (`mod` 10) . sumDigits . doubleEveryOther . toDigits)(n)
 
 
 {-
@@ -141,8 +131,8 @@ type Peg = String
 type Move = (Peg, Peg)
 
 hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
-hanoi 1 a b _ = [(a,b)]
-hanoi n a b c = hanoi (n-1) a c b ++ [(a, b)] ++ hanoi (n-1) c b a
+hanoi 1 a b _ = [(a, b)]
+hanoi n a b c = hanoi (n - 1) a c b ++ [(a, b)] ++ hanoi (n - 1) c b a
 
 
 {-
@@ -159,6 +149,6 @@ to transfer 15 discs. With four pegs it can be done in 129 moves.
 hanoiOp :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
 hanoiOp 1 a b _ _ = [(a,b)]
 hanoiOp 2 a b c _ = [(a,c), (a,b), (c,b)]
-hanoiOp n a b c d = hanoiOp (n-2) a d b c ++ [(a,c), (a,c), (c,b)] ++ hanoiOp (n-2) d b a c
+hanoiOp n a b c d = hanoiOp (n - 2) a d b c ++ [(a, c), (a, b), (c, b)] ++ hanoiOp (n - 2) d b a c
 
 
