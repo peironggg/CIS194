@@ -68,8 +68,8 @@ Example: sumDigits [16,7,12,5] = 1 + 6 + 7 + 1 + 2 + 5 = 22
 -- Exercise 3
 sumDigit :: Integer -> Integer
 sumDigit n
-  | n == 0    = 0
-  | otherwise = n `mod` 10 + sumDigit (n `div` 10)
+  | n <= 9    = n
+  | otherwise = (sumDigits . toDigits) n
 
 sumDigits :: [Integer] -> Integer
 sumDigits [] = 0
@@ -147,8 +147,9 @@ to transfer 15 discs. With four pegs it can be done in 129 moves.
 -}
 -- Exercise 6
 hanoiOp :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
-hanoiOp 1 a b _ _ = [(a,b)]
-hanoiOp 2 a b c _ = [(a,c), (a,b), (c,b)]
-hanoiOp n a b c d = hanoiOp (n - 2) a d b c ++ [(a, c), (a, b), (c, b)] ++ hanoiOp (n - 2) d b a c
+hanoiOp 1 a b _ _ = [(a, b)]
+hanoiOp 2 a b c _ = [(a, c), (a, b), (c, b)]
+hanoiOp 3 a b c d = [(a, c), (a, d), (a, b), (d, b), (c, b)]
+hanoiOp n a b c d = hanoiOp (n - 1) a c b d ++ hanoiOp 1 a b c d ++ hanoiOp (n - 1) c b a d
 
 
