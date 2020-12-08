@@ -11,3 +11,12 @@ localMaxima (x : y : z : zs)
   | otherwise      = localMaxima (y : z : zs)
 
 --Exercise 3
+histogram :: [Integer] -> String
+histogram xs = unlines (map (\row -> genLine freqMap row) [mostFreq, mostFreq - 1 .. 1]) ++ "==========\n0123456789\n"
+  where getFreq ls          = map (\num -> length $ filter (== num) ls) [0 .. 9]
+        freqMap             = getFreq xs
+        mostFreq            = maximum freqMap
+        genLine freqMap row = map (\freq -> getStr freq row) freqMap
+        getStr freq row
+          | freq >= row     = '*'
+          | otherwise       = ' '
