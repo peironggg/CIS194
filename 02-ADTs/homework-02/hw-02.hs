@@ -191,7 +191,7 @@ function, and the name of the log file to parse.
 -}
 --Exercise 5
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong msgs = ((map getMsg) . (filter getSevereErr) . inOrder . build) msgs
+whatWentWrong msgs = (map getMsg . filter getSevereErr . inOrder . build) msgs
   where getSevereErr (LogMessage (Error sev) _ _) = sev >= 50
         getSevereErr _                            = False
         getMsg       (LogMessage _ _ msg)         = msg
