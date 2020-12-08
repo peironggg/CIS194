@@ -80,9 +80,9 @@ be useful to you include lines, words, unwords, take, drop, and (.).
 parseMessage :: String -> LogMessage
 parseMessage str = case words str of
   ("E" : mt : ts : msg) -> LogMessage (Error (read mt)) (read ts) (unwords msg)
-  ("I" : ts : msg) -> LogMessage Info (read ts) (unwords msg)
-  ("W" : ts : msg) -> LogMessage Warning (read ts) (unwords msg)
-  _                -> Unknown str
+  ("I" : ts : msg)      -> LogMessage Info (read ts) (unwords msg)
+  ("W" : ts : msg)      -> LogMessage Warning (read ts) (unwords msg)
+  _                     -> Unknown str
 
 parse :: String -> [LogMessage]
 parse = map parseMessage . lines
