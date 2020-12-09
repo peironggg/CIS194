@@ -23,6 +23,7 @@ skips xs = map (\(idx, _) -> filterIdx idx ps) ps
   where
     ps :: [(Int, a)]
     ps = zip [1 .. length xs] xs
+
     filterIdx :: Int -> [(Int, a)] -> [a]
     filterIdx n ls = map snd $ filter (\(idx, _) -> idx `mod` n == 0) ls
 
@@ -73,12 +74,16 @@ histogram xs = unlines (map (\row -> genLine freqMap row) [mostFreq, mostFreq - 
   where
     getFreq :: [Integer] -> [Int] 
     getFreq ls = map (\num -> length $ filter (== num) ls) [0 .. 9]
+
     freqMap :: [Int]
     freqMap = getFreq xs
+
     mostFreq :: Int
     mostFreq = maximum freqMap
+
     genLine :: [Int] -> Int -> String
     genLine freqMap row = map (\freq -> getStr freq row) freqMap
+
     getStr :: Int -> Int -> Char
     getStr freq row
         | freq >= row = '*'
