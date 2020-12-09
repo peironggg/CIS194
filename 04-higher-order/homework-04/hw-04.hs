@@ -22,19 +22,32 @@ data Tree a = Leaf | Node Integer (Tree a) a (Tree a)
 
 foldTree :: [a] -> Tree a
 foldTree = foldr insert Leaf
-  where insert elem Leaf = Node 0 Leaf elem Leaf
-        insert elem (Node hgt left val right)
-          | getHgt left > getHgt right = Node hgt                    left val (insert elem right)
-          | getHgt left < getHgt right = Node hgt                    (insert elem left) val right
-          | otherwise                  = Node (getMaxHgt left right) (insert elem left) val right
-        getHgt Leaf             = -1
-        getHgt (Node hgt _ _ _) = hgt
-        getMaxHgt left right = 1 + max (getHgt left) (getHgt right)
+    where insert elem Leaf = Node 0 Leaf elem Leaf
+          insert elem (Node hgt left val right)
+              | getHgt left > getHgt right = Node hgt                                        left val (insert elem right)
+              | getHgt left < getHgt right = Node hgt                                        (insert elem left) val right
+              | otherwise                  = Node (1 + (getMaxHgt right $ insert elem left)) (insert elem left) val right
+          getHgt Leaf                    = -1
+          getHgt (Node hgt _ _ _)        = hgt
+          getMaxHgt firstTree secondTree = max (getHgt firstTree) (getHgt secondTree)
 
 -- putStr . showTree $ foldTree "ABCDEFGHIJ" to print the tree
 showTree Leaf = ""  
 showTree n@(Node i _ _ _) = go i n
-  where
-  go _ (Leaf) = "" 
-  go i (Node _ l c r) = go (i-1) l ++ 
-    replicate (4*fromIntegral i) ' ' ++ show c ++ "\n" ++ go (i-1) r 
+    where
+        go _ (Leaf) = "" 
+        go i (Node _ l c r) = go (i - 1) l ++ 
+            replicate (4 * fromIntegral i) ' ' ++ show c ++ "\n" ++ go (i - 1) r 
+
+
+--Exercise 3
+xor :: [Bool] -> Bool
+xor = foldr (/=) False
+
+map' :: (a -> b) -> [a] -> [b]
+map' f = foldr (\x xs -> f x : xs) []
+
+myFoldl :: (a -> b -> a) -> a -> [b] -> a
+myFoldl f initial xs = foldr (flip f) initial (reverse xs)
+
+--Exercise 4
