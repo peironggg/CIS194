@@ -1,3 +1,5 @@
+import Data.List
+
 --Exercise 1
 fun1 :: [Integer] -> Integer
 fun1 [] = 1
@@ -22,14 +24,15 @@ data Tree a = Leaf | Node Integer (Tree a) a (Tree a)
 
 foldTree :: [a] -> Tree a
 foldTree = foldr insert Leaf
-    where insert elem Leaf = Node 0 Leaf elem Leaf
-          insert elem (Node hgt left val right)
-              | getHgt left > getHgt right = Node hgt                                        left val (insert elem right)
-              | getHgt left < getHgt right = Node hgt                                        (insert elem left) val right
-              | otherwise                  = Node (1 + (getMaxHgt right $ insert elem left)) (insert elem left) val right
-          getHgt Leaf                    = -1
-          getHgt (Node hgt _ _ _)        = hgt
-          getMaxHgt firstTree secondTree = max (getHgt firstTree) (getHgt secondTree)
+  where 
+    insert elem Leaf = Node 0 Leaf elem Leaf
+    insert elem (Node hgt left val right)
+        | getHgt left > getHgt right = Node hgt                                        left val (insert elem right)
+        | getHgt left < getHgt right = Node hgt                                        (insert elem left) val right
+        | otherwise                  = Node (1 + (getMaxHgt right $ insert elem left)) (insert elem left) val right
+    getHgt Leaf                    = -1
+    getHgt (Node hgt _ _ _)        = hgt
+    getMaxHgt firstTree secondTree = max (getHgt firstTree) (getHgt secondTree)
 
 -- putStr . showTree $ foldTree "ABCDEFGHIJ" to print the tree
 showTree Leaf = ""  
@@ -51,3 +54,14 @@ myFoldl :: (a -> b -> a) -> a -> [b] -> a
 myFoldl f initial xs = foldr (flip f) initial (reverse xs)
 
 --Exercise 4
+sieveSundaram :: Integer -> [Integer]
+sieveSundaram =  map (\num -> num * 2 + 1) . removeUnwanted
+  where 
+    cartProd :: [a] -> [b] -> [(a, b)]
+    cartProd xs ys = [(x,y) | x <- xs, y <- ys]
+    -- build :: Integer -> [Integer]
+    build n = [1 .. (n + 1)]
+    -- findUnwanted :: [Int] -> [Int]
+    findUnwanted xs = map (\(i, j) -> i + j + 2 * i * j) . filter (\(i, j) -> i + j + 2 * i * j <= length xs) . cartProd xs . xs
+    -- removeUnwanted :: Integer -> [Integer]
+    removeUnwanted n = build n
