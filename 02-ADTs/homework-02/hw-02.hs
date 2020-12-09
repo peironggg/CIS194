@@ -153,7 +153,10 @@ inOrder :: MessageTree -> [LogMessage]
 inOrder Leaf                  = []
 inOrder (Node left msg right) = inOrder left ++ [msg] ++ inOrder right
 
-
+inOrder' :: MessageTree -> [LogMessage]
+inOrder' = foldTree [] (\msg xs -> msg : xs)
+  where foldTree initial _ Leaf = initial
+        foldTree initial func (Node left msg right) = foldTree (func msg (foldTree initial func right)) func left
 {-
 Now that we can sort the log messages, the only thing
 left to do is extract the relevant information. We have decided that
@@ -191,7 +194,7 @@ function, and the name of the log file to parse.
 -}
 --Exercise 5
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong msgs = (map getMsg . filter getSevereErr . inOrder . build) msgs
+whatWentWrong msgs = (map getMsg . filter getSevereErr . inOrder' . build) msgs
   where getSevereErr (LogMessage (Error sev) _ _) = sev >= 50
         getSevereErr _                            = False
         getMsg       (LogMessage _ _ msg)         = msg
