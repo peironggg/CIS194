@@ -43,6 +43,7 @@ localMaxima :: [Integer] -> [Integer]
 localMaxima (x : y : z : zs)
     | y > x && z > y = y : localMaxima (z : zs)
     | otherwise      = localMaxima (y : z : zs)
+localMaxima _ = []
 
 
 {-
