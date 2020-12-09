@@ -1,3 +1,5 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 {-
 Exercise 1 Hopscotch
 Your first task is to write a function
@@ -16,10 +18,13 @@ skips []           == []
 Note that the output should be the same length as the input.
 -}
 --Exercise 1
-skips :: [a] -> [[a]]
+skips :: forall a. [a] -> [[a]]
 skips xs = map (\(idx, _) -> filterIdx idx ps) ps
-  where ps             = zip [1 .. length xs] xs
-        filterIdx n ls = map snd $ filter (\(idx, _) -> idx `mod` n == 0) ls
+  where
+    ps :: [(Int, a)]
+    ps = zip [1 .. length xs] xs
+    filterIdx :: Int -> [(Int, a)] -> [a]
+    filterIdx n ls = map snd $ filter (\(idx, _) -> idx `mod` n == 0) ls
 
 
 {-
@@ -36,8 +41,8 @@ which finds all the local maxima in the input list and returns them in order. Fo
 --Exercise 2
 localMaxima :: [Integer] -> [Integer]
 localMaxima (x : y : z : zs)
-  | y > x && z > y = y : localMaxima (z : zs)
-  | otherwise      = localMaxima (y : z : zs)
+    | y > x && z > y = y : localMaxima (z : zs)
+    | otherwise      = localMaxima (y : z : zs)
 
 
 {-
@@ -64,10 +69,16 @@ This is a textual representation of the String output, including \n escape seque
 --Exercise 3
 histogram :: [Integer] -> String
 histogram xs = unlines (map (\row -> genLine freqMap row) [mostFreq, mostFreq - 1 .. 1]) ++ "==========\n0123456789\n"
-  where getFreq ls          = map (\num -> length $ filter (== num) ls) [0 .. 9]
-        freqMap             = getFreq xs
-        mostFreq            = maximum freqMap
-        genLine freqMap row = map (\freq -> getStr freq row) freqMap
-        getStr freq row
-          | freq >= row     = '*'
-          | otherwise       = ' '
+  where
+    getFreq :: [Integer] -> [Int] 
+    getFreq ls = map (\num -> length $ filter (== num) ls) [0 .. 9]
+    freqMap :: [Int]
+    freqMap = getFreq xs
+    mostFreq :: Int
+    mostFreq = maximum freqMap
+    genLine :: [Int] -> Int -> String
+    genLine freqMap row = map (\freq -> getStr freq row) freqMap
+    getStr :: Int -> Int -> Char
+    getStr freq row
+        | freq >= row = '*'
+        | otherwise   = ' '
