@@ -71,13 +71,13 @@ This is a textual representation of the String output, including \n escape seque
 -}
 --Exercise 3
 histogram :: [Integer] -> String
-histogram xs = unlines (map (\row -> genLine freqMap row) [mostFreq, mostFreq - 1 .. 1]) ++ "==========\n0123456789\n"
-  where
-    getFreq :: [Integer] -> [Int] 
-    getFreq xs = map (\nums -> length nums - 1) . group . sort $ xs ++ [0 .. 9]
-
+histogram xs = unlines (map (genLine freqMap) [mostFreq, mostFreq - 1 .. 1]) ++ legend
+  where        
     freqMap :: [Int]
     freqMap = getFreq xs
+      where 
+        getFreq :: [Integer] -> [Int]
+        getFreq xs = map (\nums -> length nums - 1) . group . sort $ xs ++ [0 .. 9]
 
     mostFreq :: Int
     mostFreq = maximum freqMap
@@ -89,3 +89,6 @@ histogram xs = unlines (map (\row -> genLine freqMap row) [mostFreq, mostFreq - 
     getStr freq row
         | freq >= row = '*'
         | otherwise   = ' '
+
+    legend :: String
+    legend = "==========\n0123456789\n"
