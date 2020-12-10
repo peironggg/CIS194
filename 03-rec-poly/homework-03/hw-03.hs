@@ -22,7 +22,7 @@ skips :: forall a. [a] -> [[a]]
 skips xs = map (\(idx, _) -> filterIdx idx ps) ps
   where
     ps :: [(Int, a)]
-    ps = zip [1 .. length xs] xs
+    ps = zip [1 .. ] xs
 
     filterIdx :: Int -> [(Int, a)] -> [a]
     filterIdx n ls = map snd $ filter (\(idx, _) -> idx `mod` n == 0) ls
