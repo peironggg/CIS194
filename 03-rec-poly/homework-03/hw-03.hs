@@ -1,4 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+import Data.List
 
 {-
 Exercise 1 Hopscotch
@@ -73,7 +74,7 @@ histogram :: [Integer] -> String
 histogram xs = unlines (map (\row -> genLine freqMap row) [mostFreq, mostFreq - 1 .. 1]) ++ "==========\n0123456789\n"
   where
     getFreq :: [Integer] -> [Int] 
-    getFreq ls = map (\num -> length $ filter (== num) ls) [0 .. 9]
+    getFreq xs = map (\nums -> length nums - 1) . group . sort $ xs ++ [0 .. 9]
 
     freqMap :: [Int]
     freqMap = getFreq xs
