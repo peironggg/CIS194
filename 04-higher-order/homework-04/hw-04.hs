@@ -30,17 +30,10 @@ foldTree = foldr insert Leaf
         | getHgt left > getHgt right = Node hgt                                        left val (insert elem right)
         | getHgt left < getHgt right = Node hgt                                        (insert elem left) val right
         | otherwise                  = Node (1 + (getMaxHgt right $ insert elem left)) (insert elem left) val right
-    getHgt Leaf                    = -1
-    getHgt (Node hgt _ _ _)        = hgt
-    getMaxHgt firstTree secondTree = max (getHgt firstTree) (getHgt secondTree)
-
--- putStr . showTree $ foldTree "ABCDEFGHIJ" to print the tree
-showTree Leaf = ""  
-showTree n@(Node i _ _ _) = go i n
-    where
-        go _ (Leaf) = "" 
-        go i (Node _ l c r) = go (i - 1) l ++ 
-            replicate (4 * fromIntegral i) ' ' ++ show c ++ "\n" ++ go (i - 1) r 
+          where
+            getHgt Leaf                    = -1
+            getHgt (Node hgt _ _ _)        = hgt
+            getMaxHgt firstTree secondTree = max (getHgt firstTree) (getHgt secondTree)
 
 
 --Exercise 3
@@ -56,12 +49,20 @@ myFoldl f initial xs = foldr (flip f) initial (reverse xs)
 --Exercise 4
 sieveSundaram :: Integer -> [Integer]
 sieveSundaram =  map (\num -> num * 2 + 1) . removeUnwanted
-  where 
-    cartProd :: [a] -> [b] -> [(a, b)]
-    cartProd xs ys = [(x,y) | x <- xs, y <- ys]
-    -- build :: Integer -> [Integer]
-    build n = [1 .. (n + 1)]
-    -- findUnwanted :: [Int] -> [Int]
-    findUnwanted xs = map (\(i, j) -> i + j + 2 * i * j) . filter (\(i, j) -> i + j + 2 * i * j <= length xs) . cartProd xs . xs
-    -- removeUnwanted :: Integer -> [Integer]
-    removeUnwanted n = build n
+  where         
+    removeUnwanted :: Integer -> [Integer]
+    removeUnwanted n = build n \\ (findUnwanted . build) n
+      where
+        build :: Integer -> [Integer]
+        build n = [1 .. n]
+
+        cartProd :: [a] -> [b] -> [(a, b)]
+        cartProd xs ys = [(x,y) | x <- xs, y <- ys]
+
+        findUnwanted :: [Integer] -> [Integer]
+        findUnwanted xs = map (\(i, j) -> i + j + 2 * i * j) . filter (\(i, j) -> i + j + 2 * i * j <= n) $ cartProd xs xs
+
+
+
+
+
