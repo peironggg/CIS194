@@ -282,9 +282,9 @@ instance Num (Stream Integer) where
 
     negate (Cons val tail)                  = Cons (-val) (negate tail)    
 
-    (+) (Cons aVal aTail) (Cons bVal bTail) = Cons (aVal + bVal) (aTail + bTail)
+    Cons aVal aTail + Cons bVal bTail = Cons (aVal + bVal) (aTail + bTail)
 
-    (*) (Cons aVal aTail) s@(Cons bVal bTail) 
+    Cons aVal aTail * s@(Cons bVal bTail) 
         = Cons (aVal * bVal) (streamMap (* aVal) bTail + (aTail * s))
 
 instance Fractional (Stream Integer) where
