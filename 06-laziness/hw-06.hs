@@ -280,7 +280,7 @@ x = Cons 0 (Cons 1 (streamRepeat 0))
 instance Num (Stream Integer) where
     fromInteger n = Cons n (streamRepeat 0)
 
-    negate (Cons val tail)                  = Cons (-val) (negate tail)    
+    negate                            = streamMap negate 
 
     Cons aVal aTail + Cons bVal bTail = Cons (aVal + bVal) (aTail + bTail)
 
