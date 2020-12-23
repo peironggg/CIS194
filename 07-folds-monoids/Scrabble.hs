@@ -3,7 +3,7 @@
 module Scrabble where
 
 import Data.Char
-import Data.Foldable (foldl')
+import Data.Foldable (foldMap')
 import Data.Monoid
 
 {-
@@ -59,4 +59,4 @@ score c
         c' = toLower c
 
 scoreString :: String -> Score
-scoreString = foldl' (\accumScore curr -> accumScore + score curr) (Score 0)
+scoreString = foldMap' score

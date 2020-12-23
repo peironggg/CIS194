@@ -2,7 +2,7 @@
 
 module JoinList where
 
-import Data.Foldable (foldl')
+import Data.Monoid
 import Buffer
 import Editor
 import Scrabble
@@ -149,16 +149,14 @@ We can now specify the desired behavior of indexJ. For any index i and join-list
    (indexJ i jl) == (jlToList jl !!? i)
 That is, calling indexJ on a join-list is the same as first convert- ing the join-list to a list and then indexing into the list. The point, of course, is that indexJ can be more efficient (O(log n) versus O(n), assuming a balanced join-list), because it gets to use the size annotations to throw away whole parts of the tree at once, whereas the list indexing operation has to walk over every element.
 -}
+getJLSizeInt :: (Sized b, Monoid b) => JoinList b a -> Int
+getJLSizeInt = getSize . size . tag
+
 indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
-indexJ n (Single _ a)
-    | n == 0    = Just a
-    | otherwise = Nothing
+indexJ 0 (Single _ a) = Just a    
 indexJ n (Append m jl1 jl2)    
-    | n < jl1Size = indexJ n             jl1
-    | otherwise   = indexJ (n - jl1Size) jl2
-      where
-        jl1Size :: Int
-        jl1Size = getSize . size . tag $ jl1
+    | n < getJLSizeInt jl1 = indexJ n                      jl1
+    | otherwise            = indexJ (n - getJLSizeInt jl1) jl2      
 indexJ _ _ = Nothing
 
 
@@ -172,15 +170,11 @@ The dropJ function drops the first n elements from a JoinList. This is analogous
 jlToList (dropJ n jl) == drop n (jlToList jl)
 -}
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-dropJ n (Single m a)
-    | n >= 1    = Empty
-    | otherwise = Single m a
-dropJ n (Append _ jl1 jl2)
-    | n < jl1Size = dropJ n             jl1 +++ jl2
-    | otherwise   = dropJ (n - jl1Size) jl2
-      where
-        jl1Size :: Int
-        jl1Size = getSize . size . tag $ jl1
+dropJ n jl@(Single m a) | n < 1 = jl
+dropJ n jl@(Append _ jl1 jl2)
+    | n >= getJLSizeInt jl = Empty
+    | n < getJLSizeInt jl1 = dropJ n                   jl1 +++ jl2
+    | otherwise            = dropJ (n - getJLSizeInt jl1) jl2      
 dropJ _ _ = Empty
 
 
@@ -198,11 +192,8 @@ takeJ n (Single m a)
     | n <= 0    = Empty
     | otherwise = Single m a
 takeJ n (Append _ jl1 jl2)
-    | n < jl1Size = takeJ n jl1
-    | otherwise   = jl1 +++ takeJ (n - jl1Size) jl2
-      where
-        jl1Size :: Int
-        jl1Size = getSize . size . tag $ jl1
+    | n < getJLSizeInt jl1 = takeJ n jl1
+    | otherwise            = jl1 +++ takeJ (n - getJLSizeInt jl1) jl2      
 takeJ _ _ = Empty
 
 --Exercise 3
@@ -222,13 +213,23 @@ Due to the use of the Sized type class, this type will continue to work with you
 Finally, make a main function to run the editor interface using your join-list backend in place of the slow String backend (see StringBufEditor.hs for an example of how to do this). You should create an initial buffer of type JoinList (Score, Size) String and pass it as an argument to runEditor editor. Verify that the editor demonstration described in the section “Editors and Buffers” does not exhibit delays when showing the prompt.
 -}
 --Exercise 4
+buildBalanced :: [String] -> JoinList (Score, Size) String
+buildBalanced []   = Empty
+buildBalanced strs = buildBalanced left +++ Single (scoreString str, 1) str +++ buildBalanced right
+  where
+    (left, rightPart) = splitAt ((length strs `div` 2) - 1) strs
+
+    right :: [String]
+    right = tail rightPart
+
+    str :: String
+    str = head rightPart -- Safe to use head here as splitting always leaves at least 1 in right half
+
+
 instance Buffer (JoinList (Score, Size) String) where
     toString = unlines . fromDList . jlToDList
 
-    fromString = foldl' func Empty . lines
-      where
-        func :: JoinList (Score, Size) String -> String -> JoinList (Score, Size) String
-        func jl str = jl +++ Single (scoreString str, 1) str
+    fromString = buildBalanced . lines
 
     line = indexJ
 
@@ -240,5 +241,3 @@ instance Buffer (JoinList (Score, Size) String) where
 
 --Running editor
 main = runEditor editor (Single (Score 0, Size 0) [] :: JoinList (Score, Size) String)
-
-
