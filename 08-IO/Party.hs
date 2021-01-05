@@ -1,8 +1,11 @@
 module Party where
 
+import Data.Bifunctor
+import Data.List (foldl')
 import Data.Monoid
 import Data.Semigroup
 import Data.Tree
+import Data.Tuple
 import Employee
 
 --Exercise 1
@@ -62,8 +65,9 @@ from Week 7, or infer the proper type(s) from the remainder of this
 assignment.)
 -}
 --Exercise 2
-treeFold :: (a -> [b] -> b) -> b -> Tree a -> b
-treeFold f init (Node val children) = f val (map (treeFold f init) children)
+treeFold :: (a -> [b] -> b) -> Tree a -> b
+treeFold f (Node val children) = f val (map (treeFold f) children)
+
 {-
 The algorithm
 Now let’s actually derive an algorithm to solve this problem. Clearly
@@ -109,18 +113,7 @@ guest list that includes Bob, and the overall best guest list that doesn’t
 include Bob.
 -}
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel boss bestRes = (withBoss, withoutBoss)
-  where
-    withBoss :: GuestList
-    withBoss    = glCons boss (maximumGL $ map snd bestRes)
-
-    withoutBoss :: GuestList
-    withoutBoss = maximumGL $ map fst bestRes
-     
-    maximumGL :: (Monoid a, Ord a) => [a] -> a
-    maximumGL [] = mempty
-    maximumGL xs = maximum xs
-
+nextLevel boss bestRes = first (glCons boss) (swap $ mconcat bestRes)
 
 {-
 Exercise 4
@@ -170,12 +163,3 @@ main = readFile "company.txt" >>= putStrLn . getRes . read
       where
         empNames :: [Employee] -> String
         empNames = unlines . map empName
-
-
-
-
-
-
-
-
-
