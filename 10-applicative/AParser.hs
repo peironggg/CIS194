@@ -107,9 +107,6 @@ The real power of this approach comes from the ability to create complex parsers
 will be given to us by. . . you guessed it, Applicative.
 -}
 
-
-
-
 {-
 Exercise 1
 First, you’ll need to implement a Functor instance for Parser.
@@ -122,6 +119,10 @@ first func (first, sec) = (func first, sec)
 
 instance Functor Parser where
     fmap func p1 = Parser $ fmap (first func) . runParser p1
+
+-- Working:
+-- fmap (first func) :: Maybe (a, String) -> Maybe (b, String)
+-- runParser p1 :: String -> Maybe(a, String)
 
 {-
 Exercise 2
@@ -152,7 +153,7 @@ doesn’t directly correspond to information you want to parse
 -}
 --Exercise 2
 instance Applicative Parser where
-    pure a    = Parser $ \_   -> Just (a, [])
+    pure a    = Parser $ const $ Just (a, [])
     --Working for understanding:
     --p1's runParser :: String -> Maybe((a -> b), String)
     --p2's runParser :: String -> Maybe(a, String)
@@ -192,12 +193,12 @@ Just ([12,34],"")
 -}
 --Exercise 3
 abParser :: Parser (Char, Char)
-abParser = (\a b -> (a, b)) <$> char 'a' <*> char 'b'
+abParser = (,) <$> char 'a' <*> char 'b'
 
 abParser_ :: Parser ()
 abParser_ = (\a b -> ()) <$> char 'a' <*> char 'b'
 
-intPair :: Parser ([Integer])
+intPair :: Parser [Integer]
 intPair = (\first _ sec -> [first, sec]) <$> posInt <*> char ' ' <*> posInt
 
 {-
@@ -223,7 +224,7 @@ may find useful.
 -}
 --Exercise 4
 instance Alternative Parser where
-    empty     = Parser $ \_ -> Nothing
+    empty     = Parser $ const Nothing
     p1 <|> p2 = Parser $ \str -> runParser p1 str <|> runParser p2 str
 
 
@@ -244,14 +245,4 @@ sophisticated parser for a small programming language!
 -}
 --Exercise 5
 intOrUppercase :: Parser ()
-intOrUppercase = (\a -> ()) <$> posInt <|> (\a -> ()) <$> satisfy isUpper
-
-
-
-      
-
-
-
-
-
-
+intOrUppercase = const () <$> posInt <|> const () <$> satisfy isUpper
