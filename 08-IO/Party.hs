@@ -132,7 +132,7 @@ so you can convert it back into a Tree Employee using the read function
 -}
 --Exercise 4
 maxFun :: Tree Employee -> GuestList
-maxFun = uncurry moreFun . treeFold nextLevel mempty
+maxFun = uncurry moreFun . treeFold nextLevel
 
 {-
 Exercise 5
